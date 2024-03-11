@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-
 # Create your models here.
 PART_TYPE_CHOICES = {
     'audio': 'Speakers',
@@ -18,25 +17,24 @@ PART_TYPE_CHOICES = {
 
 
 class Laptop(models.Model):
-    model = models.CharField(max_length=255, unique=True)
-    series = models.CharField(max_length=255)
+    model = models.CharField(max_length=64, unique=True)
+    series = models.CharField(max_length=64)
     manufacturer = models.CharField(max_length=255)
     year = models.IntegerField()
 
 
 class Part(models.Model):
-    serial = models.CharField(max_length=10, unique=True)
+    product_code = models.CharField(max_length=16, unique=True)
     name = models.CharField(max_length=255)
-    type = models.CharField(choices=PART_TYPE_CHOICES, max_length=16)  # choice
+    type = models.CharField(choices=PART_TYPE_CHOICES, max_length=16)
     details = models.TextField()
 
 
 # Parts required to build a laptop
 class LaptopParts(models.Model):
     laptop = models.ForeignKey(Laptop, on_delete=models.CASCADE)
-    part = models.ForeignKey(Part, on_delete=models.CASCADE, related_name='laptop_part')  # related_name necessary?
-    alternative = models.ManyToManyField(Part, related_name='alternative_part')  # related_name necessary?
-    # for each laptop unique part.type?
+    part = models.ForeignKey(Part, on_delete=models.CASCADE, related_name='laptop_part')
+    alternative = models.ManyToManyField(Part, related_name='alternative_part')
 
 
 # Laptops belonging to a user
@@ -44,18 +42,16 @@ class UserLaptop(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     laptop = models.ForeignKey(Laptop, on_delete=models.CASCADE)
     purchased = models.DateTimeField(auto_now_add=True)
+    serial = models.CharField(max_length=64, unique=True)
 
 
 # History of replaced parts for a laptop
 class UserReplacedParts(models.Model):
     user_laptop = models.ForeignKey(UserLaptop, on_delete=models.CASCADE)
-    # limit_choices_to parts inside the laptop?
-    part_old = models.ForeignKey(LaptopParts,
-                                 on_delete=models.CASCADE,
-                                 limit_choices_to={'laptop': user_laptop.laptop})
+    part_old = models.ForeignKey(LaptopParts, on_delete=models.CASCADE, null=True)
     # limit options to original part or alternative
-    part_new = models.ForeignKey(Part,
-                                 on_delete=models.CASCADE,
-                                 limit_choices_to={'type': part_old.part.type})
+    part_current = models.ForeignKey(Part,
+                                 # limit_choices_to={'type': part_old.part.type},
+                                 on_delete=models.CASCADE)
     date = models.DateField()
     comment = models.TextField()
