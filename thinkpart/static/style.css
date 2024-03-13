@@ -1,0 +1,103 @@
+/* GLOBAL */
+
+body * {
+  font-family: Arial, sans-serif;
+}
+
+a {
+  color: #404040;
+}
+
+a:hover {
+  color: black;
+}
+
+a:has(button) {
+  text-decoration: none;
+}
+
+/* NAVBAR */
+
+.nav {
+  background-color: #404040;
+  display: flex;
+}
+
+.nav .logo {
+  background-color: black;
+  padding: 10px 10px;
+  color: white;
+  font-weight: bold;
+}
+
+.nav a {
+  display: block;
+  padding: 10px 10px;
+  color: silver;
+  text-decoration: none;
+}
+
+.nav a:hover {
+  color: silver;
+  background-color: black;
+}
+
+/* CONTENT */
+
+.content {
+  margin: 20px 25% 0 25%;
+}
+
+.full-width-table {
+  width: 100%;
+}
+
+.full-width-table th {
+  text-align: left;
+}
+
+/* BUTTONS */
+
+.button-full {
+  margin: 20px 0 20px 0;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  background-color: inherit;
+  color: silver !important;
+}
+
+.button-full:hover {
+  background-color: #202020;
+}
+
+.button-outline {
+  padding: 5px;
+  border: 2px solid;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  background-color: transparent !important;
+  border-color: inherit;
+  color: inherit;
+}
+
+.button-outline:hover {
+  filter: brightness(50%);
+}
+
+.button-black {
+  background-color: #404040;
+  border-color: #404040;
+  color: #404040;
+}
+
+.button-red {
+  background-color: crimson;
+  border-color: crimson;
+  color: crimson;
+}

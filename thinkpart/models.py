@@ -22,12 +22,19 @@ class Laptop(models.Model):
     manufacturer = models.CharField(max_length=255)
     year = models.IntegerField()
 
+    def __str__(self):
+        return f'{self.manufacturer} {self.series} {self.model}'
+
 
 class Part(models.Model):
     product_code = models.CharField(max_length=16, unique=True)
     name = models.CharField(max_length=255)
     type = models.CharField(choices=PART_TYPE_CHOICES, max_length=16)
-    details = models.TextField()
+    manufacturer = models.CharField(max_length=255)
+    details = models.TextField(blank=True)
+
+    def __str__(self):
+        return f'{self.manufacturer} {self.name} {self.product_code}'
 
 
 # Parts required to build a laptop
@@ -51,7 +58,7 @@ class UserReplacedParts(models.Model):
     part_old = models.ForeignKey(LaptopParts, on_delete=models.CASCADE, null=True)
     # limit options to original part or alternative
     part_current = models.ForeignKey(Part,
-                                 # limit_choices_to={'type': part_old.part.type},
-                                 on_delete=models.CASCADE)
+                                     # limit_choices_to={'type': part_old.part.type},
+                                     on_delete=models.CASCADE)
     date = models.DateField()
     comment = models.TextField()

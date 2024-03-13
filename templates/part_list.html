@@ -1,0 +1,42 @@
+{% extends 'base.html' %} {% block content %}
+
+<div>
+  <h1>Part list</h1>
+</div>
+<div>
+  <a href="{% url 'part_add' %}">
+    <button class="button-black button-full">Add part</button>
+  </a>
+</div>
+<div>
+  <table class="full-width-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Manufacturer</th>
+        <th>Product code</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for part in parts %}
+      <tr>
+        <td><a href="{% url 'part_detail' part.pk %}">{{ part.name }}</a></td>
+        <td>{{ part.type }}</td>
+        <td>{{ part.manufacturer }}</td>
+        <td>{{ part.product_code }}</td>
+        <td>
+          <a href="{% url 'part_update' part.pk %}">
+            <button class="button-black button-outline">Update</button>
+          </a>
+          <a href="">
+            <button class="button-red button-outline">Delete</button>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

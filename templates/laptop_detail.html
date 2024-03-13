@@ -1,0 +1,27 @@
+{% extends 'base.html' %} {% block content %}
+
+<div>
+  <h1>{{ laptop }}</h1>
+</div>
+<div>
+  <table class="full-width-table">
+    <tr>
+      <th>Manufacturer</th>
+      <td>{{ laptop.manufacturer }}</td>
+    </tr>
+    <tr>
+      <th>Series</th>
+      <td>{{ laptop.series }}</td>
+    </tr>
+    <tr>
+      <th>Model</th>
+      <td>{{ laptop.model }}</td>
+    </tr>
+    <tr>
+      <th>Year</th>
+      <td>{{ laptop.year }}</td>
+    </tr>
+  </table>
+</div>
+
+{% endblock %}

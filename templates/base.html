@@ -1,0 +1,27 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ThinkRepair</title>
+    <link href="{% static 'style.css' %}" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="nav">
+        <div class="logo">ThinkRepair</div>
+        <div><a href="{% url 'home' %}">Home</a></div>
+        <div><a href="{% url 'part_list' %}">Parts</a></div>
+        <div><a href="{% url 'laptop_list' %}">Laptops</a></div>
+      </div>
+      <div class="content">
+        {% block content %}
+
+        <h1>Home</h1>
+
+        {% endblock %}
+      </div>
+      <div></div>
+    </div>
+  </body>
+</html>

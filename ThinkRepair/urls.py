@@ -17,6 +17,22 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from thinkpart import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    path('register/', views.UserRegisterView.as_view(), name='user_register'),
+
+    path('', views.HomeView.as_view(), name='home'),
+    path('parts/', views.PartListView.as_view(), name='part_list'),
+    path('parts/add/', views.PartAddView.as_view(), name='part_add'),
+    path('parts/<int:pk>/', views.PartDetailView.as_view(), name='part_detail'),
+    path('parts/edit/<int:pk>/', views.PartUpdateView.as_view(), name='part_update'),
+
+    path('laptops/', views.LaptopListView.as_view(), name='laptop_list'),
+    path('laptops/add/', views.LaptopAddView.as_view(), name='laptop_add'),
+    path('laptops/<int:pk>/', views.LaptopDetailView.as_view(), name='laptop_detail'),
+    path('laptops/edit/<int:pk>/', views.LaptopUpdateView.as_view(), name='laptop_update'),
+
 ]
