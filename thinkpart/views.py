@@ -1,7 +1,9 @@
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.views import View
 
-from thinkpart.forms import PartForm, LaptopForm, UserRegisterForm
+from thinkpart.forms import PartForm, LaptopForm, UserRegisterForm, UserLoginForm
 from thinkpart.models import Part, Laptop
 
 
@@ -24,10 +26,38 @@ class UserRegisterView(View):
     def post(self, request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
-            response = redirect('home')
-            return response
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            return redirect('home')
         return redirect('user_register')
+
+
+class UserLoginView(View):
+    def get(self, request):
+        cnx = {
+            'form_name': 'Login',
+            'form': UserLoginForm(),
+            'form_button': 'Login'
+        }
+        return render(request, 'form.html', cnx)
+
+    def post(self, request):
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password'])
+            if user is not None:
+                login(request, user)
+                return redirect('home')
+        return redirect('user_login')
+
+
+class UserLogoutView(LoginRequiredMixin, View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            logout(request)
+        response = redirect('home')
+        return response
 
 
 class PartListView(View):
@@ -83,6 +113,19 @@ class PartUpdateView(View):
         return redirect('part_update', pk=part.pk)
 
 
+class PartDeleteView(View):
+    def get(self, request, pk):
+        part = Part.objects.get(pk=pk)
+        response = render(request, 'form_delete.html', {'object': part})
+        return response
+
+    def post(self, request, pk):
+        part = Part.objects.get(pk=pk)
+        if request.POST.get('confirm') == 'True':
+            part.delete()
+        return redirect('part_list')
+
+
 class LaptopListView(View):
     def get(self, request):
         laptops = Laptop.objects.all()
@@ -134,3 +177,16 @@ class LaptopUpdateView(View):
             form.save()
             return redirect('laptop_list')
         return redirect('laptop_update', pk=laptop.pk)
+
+
+class LaptopDeleteView(View):
+    def get(self, request, pk):
+        laptop = Laptop.objects.get(pk=pk)
+        response = render(request, 'form_delete.html', {'object': laptop})
+        return response
+
+    def post(self, request, pk):
+        laptop = Laptop.objects.get(pk=pk)
+        if request.POST.get('confirm') == 'True':
+            laptop.delete()
+        return redirect('laptop_list')

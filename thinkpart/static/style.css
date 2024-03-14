@@ -42,6 +42,10 @@ a:has(button) {
   background-color: black;
 }
 
+.nav-user {
+  margin-left: auto;
+}
+
 /* CONTENT */
 
 .content {

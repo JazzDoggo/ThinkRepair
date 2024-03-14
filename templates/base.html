@@ -13,6 +13,14 @@
         <div><a href="{% url 'home' %}">Home</a></div>
         <div><a href="{% url 'part_list' %}">Parts</a></div>
         <div><a href="{% url 'laptop_list' %}">Laptops</a></div>
+        {% if user.is_authenticated %}
+        <div class="nav-user"><a href="{% url 'user_logout' %}">Logout</a></div>
+        {% else %}
+        <div class="nav-user">
+          <a href="{% url 'user_register' %}">Register</a>
+        </div>
+        <div><a href="{% url 'user_login' %}">Login</a></div>
+        {% endif %}
       </div>
       <div class="content">
         {% block content %}

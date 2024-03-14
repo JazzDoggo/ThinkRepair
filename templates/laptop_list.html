@@ -32,7 +32,7 @@
           <a href="{% url 'laptop_update' laptop.pk %}">
             <button class="button-black button-outline">Update</button>
           </a>
-          <a href="">
+          <a href="{% url 'laptop_delete' laptop.pk %}">
             <button class="button-red button-outline">Delete</button>
           </a>
         </td>

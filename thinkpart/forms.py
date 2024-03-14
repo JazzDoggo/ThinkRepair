@@ -6,11 +6,12 @@ from thinkpart.models import Part, Laptop
 
 
 class UserRegisterForm(forms.ModelForm):
+    password = forms.CharField(label='Password', max_length=64, widget=forms.PasswordInput())
     re_password = forms.CharField(label='Re-Password', max_length=64, widget=forms.PasswordInput())
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email']
 
     def clean(self):
         cleaned_data = super(UserRegisterForm, self).clean()
@@ -18,6 +19,11 @@ class UserRegisterForm(forms.ModelForm):
         re_password = cleaned_data.get('re_password')
         if password != re_password:
             raise ValidationError("Passwords do not match")
+
+
+class UserLoginForm(forms.Form):
+    username = forms.CharField(label='Username', max_length=64)
+    password = forms.CharField(label='Password', max_length=64, widget=forms.PasswordInput())
 
 
 class PartForm(forms.ModelForm):
