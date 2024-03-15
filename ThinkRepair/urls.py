@@ -39,4 +39,7 @@ urlpatterns = [
     path('laptops/edit/<int:pk>/', views.LaptopUpdateView.as_view(), name='laptop_update'),
     path('laptops/delete/<int:pk>/', views.LaptopDeleteView.as_view(), name='laptop_delete'),
 
+    path('laptops/<int:laptop_pk>/parts/add/', views.LaptopPartAddView.as_view(), name='laptop_part_add'),
+    path('laptops/<int:laptop_pk>/parts/<int:laptop_part_pk>/', views.LaptopPartUpdateView.as_view(),
+         name='laptop_part_update'),
 ]

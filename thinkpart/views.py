@@ -3,8 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.views import View
 
-from thinkpart.forms import PartForm, LaptopForm, UserRegisterForm, UserLoginForm
-from thinkpart.models import Part, Laptop
+from thinkpart.forms import PartForm, LaptopForm, UserRegisterForm, UserLoginForm, LaptopPartForm
+from thinkpart.models import Part, Laptop, LaptopParts
 
 
 # Create your views here.
@@ -12,6 +12,9 @@ class HomeView(View):
     def get(self, request):
         response = render(request, 'base.html')
         return response
+
+
+# USER VIEWS
 
 
 class UserRegisterView(View):
@@ -60,6 +63,9 @@ class UserLogoutView(LoginRequiredMixin, View):
         return response
 
 
+# PARTS VIEWS
+
+
 class PartListView(View):
     def get(self, request):
         parts = Part.objects.all()
@@ -72,7 +78,7 @@ class PartAddView(View):
     def get(self, request):
         cnx = {
             'form_name': 'Add part',
-            'form': PartForm,
+            'form': PartForm(),
             'form_button': 'Add'
         }
         response = render(request, 'form.html', cnx)
@@ -126,6 +132,9 @@ class PartDeleteView(View):
         return redirect('part_list')
 
 
+# LAPTOP VIEWS
+
+
 class LaptopListView(View):
     def get(self, request):
         laptops = Laptop.objects.all()
@@ -138,7 +147,7 @@ class LaptopAddView(View):
     def get(self, request):
         cnx = {
             'form_name': 'Add laptop',
-            'form': LaptopForm,
+            'form': LaptopForm(),
             'form_button': 'Add'
         }
         response = render(request, 'form.html', cnx)
@@ -190,3 +199,51 @@ class LaptopDeleteView(View):
         if request.POST.get('confirm') == 'True':
             laptop.delete()
         return redirect('laptop_list')
+
+
+# LAPTOP PARTS VIEWS
+
+
+class LaptopPartAddView(View):
+    def get(self, request, laptop_pk):
+        laptop = Laptop.objects.get(pk=laptop_pk)
+        cnx = {
+            'form_name': f'Add laptop part to {laptop}',
+            'form': LaptopPartForm(),
+            'form_button': 'Add'
+        }
+        return render(request, 'form.html', cnx)
+
+    def post(self, request, laptop_pk):
+        laptop = Laptop.objects.get(pk=laptop_pk)
+        form = LaptopPartForm(request.POST)
+        if form.is_valid():
+            laptop_part = form.save(commit=False)
+            laptop_part.laptop = laptop
+            laptop_part.save()
+            laptop_part.alternative.set(form.cleaned_data['alternative'])
+        return redirect('laptop_detail', laptop.pk)
+
+
+class LaptopPartUpdateView(View):
+    def get(self, request, laptop_pk, laptop_part_pk):
+        laptop = Laptop.objects.get(pk=laptop_pk)
+        laptop_part = LaptopParts.objects.get(pk=laptop_part_pk)
+        cnx = {
+            'form_name': f'Update laptop part for {laptop}',
+            'form': LaptopPartForm(instance=laptop_part),
+            'form_button': 'Update'
+        }
+        return render(request, 'form.html', cnx)
+
+    def post(self, request, laptop_pk, laptop_part_pk):
+        laptop = Laptop.objects.get(pk=laptop_pk)
+        laptop_part = LaptopParts.objects.get(pk=laptop_part_pk)
+        form = LaptopPartForm(request.POST, instance=laptop_part)
+        if form.is_valid():
+            laptop_part = form.save(commit=False)
+            laptop_part.laptop = laptop
+            laptop_part.save()
+            laptop_part.alternative.set(form.cleaned_data['alternative'], clear=True)
+        return redirect('laptop_detail', laptop.pk)
+

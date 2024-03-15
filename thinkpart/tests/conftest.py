@@ -42,7 +42,7 @@ def fix_part_data():
 
 @pytest.fixture
 def fix_parts():
-    for i in range(3):
+    for i in range(5):
         Part.objects.create(
             product_code=f'{i}' * 8,
             name='Test part',
@@ -65,10 +65,23 @@ def fix_laptop_data():
 
 @pytest.fixture
 def fix_laptops():
-    for i in range(3):
+    for i in range(5):
         Laptop.objects.create(
             model=f'T4{i}0',
             series='ThinkPad',
             manufacturer='Lenovo',
             year=f'201{i}',
         )
+
+
+@pytest.fixture
+def fix_laptop_part_data(fix_parts, fix_laptops):
+    part = Part.objects.first()
+    alternatives = []
+    for p in Part.objects.exclude(pk=part.pk)[:2]:
+        alternatives.append(p.pk)
+    data = {
+        'part': part.pk,
+        'alternative': alternatives,
+    }
+    return data

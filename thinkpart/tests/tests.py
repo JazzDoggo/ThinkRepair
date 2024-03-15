@@ -3,13 +3,12 @@ from random import choice
 import pytest
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.forms.models import ModelFormMetaclass
 from django.shortcuts import resolve_url
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from thinkpart.forms import PartForm, LaptopForm
-from thinkpart.models import Laptop, Part
+from thinkpart.forms import PartForm, LaptopForm, LaptopPartForm
+from thinkpart.models import Laptop, Part, LaptopParts
 
 
 # Create your tests here.
@@ -17,6 +16,9 @@ def test_home_get(client):
     url = reverse('home')
     response = client.get(url)
     assert response.status_code == 200
+
+
+# TEST USERS
 
 
 def test_user_register_get(client):
@@ -69,6 +71,9 @@ def test_user_logout_get(client, fix_user):
     assert not response.context['user'].is_authenticated
 
 
+# TEST PARTS
+
+
 @pytest.mark.django_db
 def test_part_list_get(client, fix_parts):
     parts = Part.objects.all()
@@ -110,7 +115,10 @@ def test_part_update_get(client, fix_parts):
     url = resolve_url('part_update', pk=part.pk)
     response = client.get(url)
     assert response.status_code == 200
-    assert isinstance(response.context['form'], PartForm)  # better way? compare data?
+    assert isinstance(response.context['form'], PartForm)
+    # form = response.context['form']
+    # form.is_valid()
+    # assert form.cleaned_data['name'] == part.name
 
 
 @pytest.mark.django_db
@@ -119,7 +127,8 @@ def test_part_update_post(client, fix_parts, fix_part_data):
     url = resolve_url('part_update', pk=part.pk)
     response = client.post(url, fix_part_data)
     assert response.status_code == 302
-    assert fix_part_data['product_code'] == Part.objects.get(pk=part.pk).product_code  # check all fields?
+    test_part = Part(**fix_part_data, pk=part.pk)
+    assert Part.objects.get(pk=part.pk) == test_part
 
 
 @pytest.mark.django_db
@@ -144,7 +153,7 @@ def test_part_delete_get_no_object(client, fix_parts):
     part = Part.objects.last()
     url = resolve_url('laptop_delete', pk=part.pk + 1)
     with pytest.raises(ObjectDoesNotExist):
-        response = client.get(url)
+        client.get(url)
 
 
 @pytest.mark.django_db
@@ -155,6 +164,9 @@ def test_part_delete_post(client, fix_parts):
     response = client.post(url, {'confirm': 'True'}, follow=True)
     assert response.status_code == 200
     assert Part.objects.count() == parts_previous - 1
+
+
+# TEST LAPTOPS
 
 
 @pytest.mark.django_db
@@ -171,7 +183,7 @@ def test_laptop_add_get(client):
     response = client.get(url)
     form = response.context['form']
     assert response.status_code == 200
-    assert isinstance(form, ModelFormMetaclass)
+    assert isinstance(form, LaptopForm)
 
 
 @pytest.mark.django_db
@@ -206,7 +218,8 @@ def test_laptop_update_post(client, fix_laptops, fix_laptop_data):
     url = resolve_url('laptop_update', pk=laptop.pk)
     response = client.post(url, fix_laptop_data)
     assert response.status_code == 302
-    assert fix_laptop_data['model'] == Laptop.objects.get(pk=laptop.pk).model  # check all fields?
+    test_laptop = Laptop(**fix_laptop_data, pk=laptop.pk)
+    assert Laptop.objects.get(pk=laptop.pk) == test_laptop
 
 
 @pytest.mark.django_db
@@ -222,7 +235,7 @@ def test_laptop_delete_get_no_object(client, fix_laptops):
     laptop = Laptop.objects.last()
     url = resolve_url('laptop_delete', pk=laptop.pk + 1)
     with pytest.raises(ObjectDoesNotExist):
-        response = client.get(url)
+        client.get(url)
 
 
 @pytest.mark.django_db
@@ -233,3 +246,25 @@ def test_laptop_delete_post(client, fix_laptops):
     response = client.post(url, {'confirm': 'True'}, follow=True)
     assert response.status_code == 200
     assert Laptop.objects.count() == laptops_previous - 1
+
+
+# TEST LAPTOP PARTS
+
+
+@pytest.mark.django_db
+def test_laptop_part_add_get(client, fix_parts, fix_laptops):
+    laptop = Laptop.objects.first()
+    url = resolve_url('laptop_part_add', laptop_pk=laptop.pk)
+    response = client.get(url)
+    assert response.status_code == 200
+    assert isinstance(response.context['form'], LaptopPartForm)
+
+
+@pytest.mark.django_db
+def test_laptop_part_add_post(client, fix_parts, fix_laptops, fix_laptop_part_data):
+    laptop = Laptop.objects.first()
+    laptop_parts_previous = LaptopParts.objects.count()
+    url = resolve_url('laptop_part_add', laptop_pk=laptop.pk)
+    response = client.post(url, fix_laptop_part_data)
+    assert response.status_code == 302
+    assert LaptopParts.objects.count() == laptop_parts_previous + 1

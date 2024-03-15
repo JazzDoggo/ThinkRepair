@@ -3,6 +3,7 @@
 <div>
   <h1>{{ part }}</h1>
 </div>
+
 <div>
   <table class="full-width-table">
     <tr>
@@ -26,6 +27,15 @@
       <td>{{ part.details }}</td>
     </tr>
   </table>
+</div>
+
+<div>
+  <a href="{% url 'part_update' part.pk %}">
+    <button class="button-black button-full">Update</button>
+  </a>
+  <a href="{% url 'part_delete' part.pk %}">
+    <button class="button-red button-full">Delete</button>
+  </a>
 </div>
 
 {% endblock %}

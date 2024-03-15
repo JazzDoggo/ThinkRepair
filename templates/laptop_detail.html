@@ -22,6 +22,58 @@
       <td>{{ laptop.year }}</td>
     </tr>
   </table>
+
+  <div>
+    <a href="{% url 'laptop_update' laptop.pk %}">
+      <button class="button-black button-full">Update</button>
+    </a>
+    <a href="{% url 'laptop_delete' laptop.pk %}">
+      <button class="button-red button-full">Delete</button>
+    </a>
+    <a href="{% url 'laptop_part_add' laptop.pk %}">
+      <button class="button-black button-full">Add laptop part</button>
+    </a>
+  </div>
+
+  <h2>Laptop parts</h2>
+
+  <table class="full-width-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Manufacturer</th>
+        <th>Product code</th>
+        <th>Alternative</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for laptop_part in laptop.laptopparts_set.all %}
+      <tr>
+        <td>{{ laptop_part.part.name }}</td>
+        <td>{{ laptop_part.part.type }}</td>
+        <td>{{ laptop_part.part.manufacturer }}</td>
+        <td>{{ laptop_part.part.product_code }}</td>
+        <td>
+          <ul class="table-list">
+            {% for part in laptop_part.alternative.all %}
+            <li>{{ part }}</li>
+            {% endfor %}
+          </ul>
+        </td>
+        <td>
+          <a href="{% url 'laptop_part_update' laptop.pk laptop_part.pk %}">
+            <button class="button-black button-outline">Update</button>
+          </a>
+          <a href="">
+            <button class="button-red button-outline">Delete</button>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
 {% endblock %}

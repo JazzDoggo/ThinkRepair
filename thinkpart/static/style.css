@@ -60,6 +60,11 @@ a:has(button) {
   text-align: left;
 }
 
+.table-list {
+  padding: 0;
+  list-style-position: inside;
+}
+
 /* BUTTONS */
 
 .button-full {

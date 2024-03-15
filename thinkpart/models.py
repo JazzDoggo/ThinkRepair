@@ -41,7 +41,7 @@ class Part(models.Model):
 class LaptopParts(models.Model):
     laptop = models.ForeignKey(Laptop, on_delete=models.CASCADE)
     part = models.ForeignKey(Part, on_delete=models.CASCADE, related_name='laptop_part')
-    alternative = models.ManyToManyField(Part, related_name='alternative_part')
+    alternative = models.ManyToManyField(Part, related_name='alternative_part', blank=True)
 
 
 # Laptops belonging to a user
