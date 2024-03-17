@@ -100,5 +100,3 @@ def test_laptop_part_delete_post(client, fix_user, fix_parts, fix_laptops, fix_l
     assert UserLaptop.objects.count() == user_laptop_previous - 1
     # assert UserReplacedPart.objects.count() == user_replaced_parts_previous - user_replaced_parts
     assert UserReplacedPart.objects.count() == 0
-
-
