@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from thinkpart.forms import PartForm, LaptopForm, UserRegisterForm, UserLoginForm, LaptopPartForm
-from thinkpart.models import Part, Laptop, LaptopParts
+from thinkpart.models import Part, Laptop, LaptopPart
 
 
 # Create your views here.
@@ -32,7 +32,7 @@ class UserRegisterView(View):
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
-            return redirect('home')
+            return redirect('user_login')
         return redirect('user_register')
 
 
@@ -228,7 +228,7 @@ class LaptopPartAddView(View):
 class LaptopPartUpdateView(View):
     def get(self, request, laptop_pk, laptop_part_pk):
         laptop = Laptop.objects.get(pk=laptop_pk)
-        laptop_part = LaptopParts.objects.get(pk=laptop_part_pk)
+        laptop_part = LaptopPart.objects.get(pk=laptop_part_pk)
         cnx = {
             'form_name': f'Update laptop part for {laptop}',
             'form': LaptopPartForm(instance=laptop_part),
@@ -238,7 +238,7 @@ class LaptopPartUpdateView(View):
 
     def post(self, request, laptop_pk, laptop_part_pk):
         laptop = Laptop.objects.get(pk=laptop_pk)
-        laptop_part = LaptopParts.objects.get(pk=laptop_part_pk)
+        laptop_part = LaptopPart.objects.get(pk=laptop_part_pk)
         form = LaptopPartForm(request.POST, instance=laptop_part)
         if form.is_valid():
             laptop_part = form.save(commit=False)
@@ -247,3 +247,15 @@ class LaptopPartUpdateView(View):
             laptop_part.alternative.set(form.cleaned_data['alternative'], clear=True)
         return redirect('laptop_detail', laptop.pk)
 
+
+class LaptopPartDeleteView(View):
+    def get(self, request, laptop_pk, laptop_part_pk):
+        laptop_part = LaptopPart.objects.get(pk=laptop_part_pk)
+        return render(request, 'form_delete.html', {'object': laptop_part})
+
+    def post(self, request, laptop_pk, laptop_part_pk):
+        if request.POST.get('confirm') == 'True':
+            laptop_part = LaptopPart.objects.get(pk=laptop_part_pk)
+            laptop_part.clean()
+            laptop_part.delete()
+        return redirect('laptop_detail', laptop_pk)

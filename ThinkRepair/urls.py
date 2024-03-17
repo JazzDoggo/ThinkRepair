@@ -17,29 +17,38 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from thinkpart import views
+from thinkpart import views as thinkpart_views
+from thinkuser import views as thinkuser_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('register/', views.UserRegisterView.as_view(), name='user_register'),
-    path('login/', views.UserLoginView.as_view(), name='user_login'),
-    path('logout/', views.UserLogoutView.as_view(), name='user_logout'),
+    path('register/', thinkpart_views.UserRegisterView.as_view(), name='user_register'),
+    path('login/', thinkpart_views.UserLoginView.as_view(), name='user_login'),
+    path('logout/', thinkpart_views.UserLogoutView.as_view(), name='user_logout'),
 
-    path('', views.HomeView.as_view(), name='home'),
-    path('parts/', views.PartListView.as_view(), name='part_list'),
-    path('parts/add/', views.PartAddView.as_view(), name='part_add'),
-    path('parts/<int:pk>/', views.PartDetailView.as_view(), name='part_detail'),
-    path('parts/edit/<int:pk>/', views.PartUpdateView.as_view(), name='part_update'),
-    path('parts/delete/<int:pk>/', views.PartDeleteView.as_view(), name='part_delete'),
+    path('', thinkpart_views.HomeView.as_view(), name='home'),
+    path('parts/', thinkpart_views.PartListView.as_view(), name='part_list'),
+    path('parts/add/', thinkpart_views.PartAddView.as_view(), name='part_add'),
+    path('parts/<int:pk>/', thinkpart_views.PartDetailView.as_view(), name='part_detail'),
+    path('parts/edit/<int:pk>/', thinkpart_views.PartUpdateView.as_view(), name='part_update'),
+    path('parts/delete/<int:pk>/', thinkpart_views.PartDeleteView.as_view(), name='part_delete'),
 
-    path('laptops/', views.LaptopListView.as_view(), name='laptop_list'),
-    path('laptops/add/', views.LaptopAddView.as_view(), name='laptop_add'),
-    path('laptops/<int:pk>/', views.LaptopDetailView.as_view(), name='laptop_detail'),
-    path('laptops/edit/<int:pk>/', views.LaptopUpdateView.as_view(), name='laptop_update'),
-    path('laptops/delete/<int:pk>/', views.LaptopDeleteView.as_view(), name='laptop_delete'),
+    path('laptops/', thinkpart_views.LaptopListView.as_view(), name='laptop_list'),
+    path('laptops/add/', thinkpart_views.LaptopAddView.as_view(), name='laptop_add'),
+    path('laptops/<int:pk>/', thinkpart_views.LaptopDetailView.as_view(), name='laptop_detail'),
+    path('laptops/edit/<int:pk>/', thinkpart_views.LaptopUpdateView.as_view(), name='laptop_update'),
+    path('laptops/delete/<int:pk>/', thinkpart_views.LaptopDeleteView.as_view(), name='laptop_delete'),
 
-    path('laptops/<int:laptop_pk>/parts/add/', views.LaptopPartAddView.as_view(), name='laptop_part_add'),
-    path('laptops/<int:laptop_pk>/parts/<int:laptop_part_pk>/', views.LaptopPartUpdateView.as_view(),
+    path('laptops/<int:laptop_pk>/parts/add/', thinkpart_views.LaptopPartAddView.as_view(), name='laptop_part_add'),
+    path('laptops/<int:laptop_pk>/parts/<int:laptop_part_pk>/', thinkpart_views.LaptopPartUpdateView.as_view(),
          name='laptop_part_update'),
+    path('laptops/<int:laptop_pk>/parts/delete/<int:laptop_part_pk>', thinkpart_views.LaptopPartDeleteView.as_view(),
+         name='laptop_part_delete'),
+
+    path('user/laptops/add/', thinkuser_views.UserLaptopAddView.as_view(), name='user_laptop_add'),
+    path('user/laptops/', thinkuser_views.UserLaptopListView.as_view(), name='user_laptop_list'),
+    path('user/laptops/<int:pk>/', thinkuser_views.UserLaptopDetailView.as_view(), name='user_laptop_detail'),
+    path('user/laptops/delete/<int:pk>/', thinkuser_views.UserLaptopDeleteView.as_view(), name='user_laptop_delete'),
+
 ]

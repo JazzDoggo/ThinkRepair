@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from thinkpart.models import Part, Laptop, LaptopParts
+from thinkpart.models import Part, Laptop, LaptopPart, UserLaptop
 
 
 class UserRegisterForm(forms.ModelForm):
@@ -40,5 +40,11 @@ class LaptopForm(forms.ModelForm):
 
 class LaptopPartForm(forms.ModelForm):
     class Meta:
-        model = LaptopParts
+        model = LaptopPart
         fields = ['part', 'alternative']
+
+
+class UserLaptopForm(forms.ModelForm):
+    class Meta:
+        model = UserLaptop
+        fields = ['laptop', 'serial']

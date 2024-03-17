@@ -6,6 +6,9 @@
     <title>ThinkRepair</title>
     <link href="{% static 'style.css' %}" rel="stylesheet" />
   </head>
+
+  {% load l10n %} {% localize off %}
+
   <body>
     <div class="container">
       <div class="nav">
@@ -13,23 +16,27 @@
         <div><a href="{% url 'home' %}">Home</a></div>
         <div><a href="{% url 'part_list' %}">Parts</a></div>
         <div><a href="{% url 'laptop_list' %}">Laptops</a></div>
+        <div class="nav-user"></div>
         {% if user.is_authenticated %}
-        <div class="nav-user"><a href="{% url 'user_logout' %}">Logout</a></div>
+        <div><a href="{% url 'user_laptop_list' %}">{{ user }}</a></div>
+        <div><a href="{% url 'user_logout' %}">Logout</a></div>
         {% else %}
-        <div class="nav-user">
-          <a href="{% url 'user_register' %}">Register</a>
-        </div>
+        <div><a href="{% url 'user_register' %}">Register</a></div>
         <div><a href="{% url 'user_login' %}">Login</a></div>
         {% endif %}
       </div>
+
       <div class="content">
         {% block content %}
 
-        <h1>Home</h1>
+        <h1>Welcome to ThinkRepair</h1>
 
         {% endblock %}
       </div>
+
       <div></div>
     </div>
+
+    {% endlocalize %}
   </body>
 </html>

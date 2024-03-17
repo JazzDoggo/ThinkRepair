@@ -1,0 +1,75 @@
+{% extends 'base.html' %} {% block content %}
+
+<div>
+  <h1>{{ user_laptop }}</h1>
+</div>
+<div>
+  <table>
+    <tr>
+      <th>Manufacturer</th>
+      <td>{{ user_laptop.laptop.manufacturer }}</td>
+    </tr>
+    <tr>
+      <th>Series</th>
+      <td>{{ user_laptop.laptop.series }}</td>
+    </tr>
+    <tr>
+      <th>Model</th>
+      <td>{{ user_laptop.laptop.model }}</td>
+    </tr>
+    <tr>
+      <th>Year</th>
+      <td>{{ user_laptop.laptop.year }}</td>
+    </tr>
+    <tr>
+      <th>Serial number</th>
+      <td>{{ user_laptop.serial }}</td>
+    </tr>
+    <tr>
+      <th>Purchase date</th>
+      <td>{{ user_laptop.purchased }}</td>
+    </tr>
+  </table>
+
+  <div>
+    <a href="">
+      <button class="button-black button-full">Parts history</button>
+    </a>
+    <a href="{% url 'user_laptop_delete' user_laptop.pk %}">
+      <button class="button-red button-full">Delete</button>
+    </a>
+  </div>
+
+  <h2>Current laptop parts:</h2>
+
+  <table class="full-width-table">
+    <thead>
+      <tr>
+        <th>Original part</th>
+        <th>Current part</th>
+        <th>Type</th>
+        <th>Date</th>
+        <th>Comment</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for replaced_part in user_laptop_parts_current %}
+      <tr>
+        <td>{{ replaced_part.part_original.part }}</td>
+        <td>{{ replaced_part.part_current }}</td>
+        <td>{{ replaced_part.part_original.part.type }}</td>
+        <td>{{ replaced_part.date }}</td>
+        <td>{{ replaced_part.comment }}</td>
+        <td>
+          <a href="">
+            <button class="button-black button-outline">Replace</button>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

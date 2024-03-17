@@ -4,7 +4,7 @@
   <h1>{{ laptop }}</h1>
 </div>
 <div>
-  <table class="full-width-table">
+  <table>
     <tr>
       <th>Manufacturer</th>
       <td>{{ laptop.manufacturer }}</td>
@@ -49,7 +49,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for laptop_part in laptop.laptopparts_set.all %}
+      {% for laptop_part in laptop.laptoppart_set.all %}
       <tr>
         <td>{{ laptop_part.part.name }}</td>
         <td>{{ laptop_part.part.type }}</td>
@@ -66,7 +66,7 @@
           <a href="{% url 'laptop_part_update' laptop.pk laptop_part.pk %}">
             <button class="button-black button-outline">Update</button>
           </a>
-          <a href="">
+          <a href="{% url 'laptop_part_delete' laptop.pk laptop_part.pk %}">
             <button class="button-red button-outline">Delete</button>
           </a>
         </td>

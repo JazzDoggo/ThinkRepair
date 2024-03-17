@@ -20,6 +20,7 @@
       </tr>
     </thead>
     <tbody>
+    
       {% for part in parts %}
       <tr>
         <td><a href="{% url 'part_detail' part.pk %}">{{ part.name }}</a></td>
