@@ -3,6 +3,7 @@ from django.shortcuts import resolve_url
 from django.test import TestCase
 from django.urls import reverse
 
+from thinkpart.forms import UserLaptopForm, UserReplacedPartForm
 from thinkpart.models import UserLaptop, UserReplacedPart
 from thinkpart.tests.conftest import *
 
@@ -16,6 +17,7 @@ def test_user_laptop_add_get(client, fix_user):
     url = reverse('user_laptop_add')
     response = client.get(url)
     assert response.status_code == 200
+    assert isinstance(response.context['form'], UserLaptopForm)
 
 
 @pytest.mark.django_db
@@ -61,19 +63,37 @@ def test_user_laptop_list_get_other_user(client, fix_user_other, fix_laptops):
 
 
 @pytest.mark.django_db
-def test_user_laptop_detail_get(client, fix_user, fix_laptops, fix_user_laptop):
+def test_user_laptop_current_get(client, fix_user, fix_laptops, fix_user_laptop):
     client.force_login(user=fix_user)
     user_laptop = UserLaptop.objects.get(user=fix_user)
-    url = resolve_url('user_laptop_detail', user_laptop.pk)
+    url = resolve_url('user_laptop_current', user_laptop.pk)
     response = client.get(url)
     assert response.status_code == 200
 
 
 @pytest.mark.django_db
-def test_user_laptop_detail_get_other_user(client, fix_user, fix_user_other, fix_laptops, fix_user_laptop):
+def test_user_laptop_current_get_other_user(client, fix_user, fix_user_other, fix_laptops, fix_user_laptop):
     client.force_login(user=fix_user_other)
     user_laptop = UserLaptop.objects.get(user=fix_user)
-    url = resolve_url('user_laptop_detail', user_laptop.pk)
+    url = resolve_url('user_laptop_current', user_laptop.pk)
+    response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_user_laptop_history_get(client, fix_user, fix_laptops, fix_user_laptop):
+    client.force_login(user=fix_user)
+    user_laptop = UserLaptop.objects.get(user=fix_user)
+    url = resolve_url('user_laptop_history', user_laptop.pk)
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_user_laptop_history_get_other_user(client, fix_user, fix_user_other, fix_laptops, fix_user_laptop):
+    client.force_login(user=fix_user_other)
+    user_laptop = UserLaptop.objects.get(user=fix_user)
+    url = resolve_url('user_laptop_history', user_laptop.pk)
     response = client.get(url)
     assert response.status_code == 403
 
@@ -100,3 +120,36 @@ def test_laptop_part_delete_post(client, fix_user, fix_parts, fix_laptops, fix_l
     assert UserLaptop.objects.count() == user_laptop_previous - 1
     # assert UserReplacedPart.objects.count() == user_replaced_parts_previous - user_replaced_parts
     assert UserReplacedPart.objects.count() == 0
+
+
+@pytest.mark.django_db
+def test_user_replace_part_add_get(client, fix_user, fix_parts, fix_laptops, fix_laptop_parts, fix_user_laptop):
+    client.force_login(user=fix_user)
+    user_laptop = UserLaptop.objects.get(user=fix_user)
+    laptop_part = user_laptop.laptop.laptoppart_set.first()
+    url = resolve_url('user_laptop_replace_part', user_laptop_pk=user_laptop.pk, laptop_part_pk=laptop_part.pk)
+    response = client.get(url)
+    assert response.status_code == 200
+    assert isinstance(response.context['form'], UserReplacedPartForm)
+
+
+@pytest.mark.django_db
+def test_user_replace_part_add_get_other_user(client, fix_user, fix_user_other, fix_parts, fix_laptops,
+                                              fix_laptop_parts, fix_user_laptop):
+    client.force_login(user=fix_user_other)
+    user_laptop = UserLaptop.objects.get(user=fix_user)
+    laptop_part = user_laptop.laptop.laptoppart_set.first()
+    url = resolve_url('user_laptop_replace_part', user_laptop_pk=user_laptop.pk, laptop_part_pk=laptop_part.pk)
+    response = client.get(url)
+    assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_user_replace_part_add_get_diff_laptop(client, fix_user, fix_parts, fix_laptops, fix_laptop_parts,
+                                               fix_user_laptop):
+    client.force_login(user=fix_user)
+    user_laptop = UserLaptop.objects.get(user=fix_user)
+    laptop_part = LaptopPart.objects.create(laptop=Laptop.objects.last(), part=Part.objects.first())
+    url = resolve_url('user_laptop_replace_part', user_laptop_pk=user_laptop.pk, laptop_part_pk=laptop_part.pk)
+    response = client.get(url)
+    assert response.status_code == 302

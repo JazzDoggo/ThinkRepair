@@ -1,0 +1,47 @@
+{% extends 'user_laptop.html' %} {% block user_laptop_detail %}
+    
+    <div>
+        <a href="{% url 'user_laptop_history' user_laptop.pk %}">
+            <button class="button-black button-full">Parts history</button>
+        </a>
+        <a href="{% url 'user_laptop_delete' user_laptop.pk %}">
+            <button class="button-red button-full">Delete</button>
+        </a>
+    </div>
+    
+    <div>
+        <h2>Current laptop parts:</h2>
+    </div>
+
+    <div>
+        <table class="full-width-table">
+            <thead>
+            <tr>
+                <th>Original part</th>
+                <th>Current part</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Comment</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for replaced_part in user_laptop_replaced_parts %}
+                <tr>
+                    <td>{{ replaced_part.part_original.part }}</td>
+                    <td>{{ replaced_part.part_current }}</td>
+                    <td>{{ replaced_part.part_original.part.type }}</td>
+                    <td>{{ replaced_part.date }}</td>
+                    <td>{{ replaced_part.comment }}</td>
+                    <td>
+                        <a href="{% url 'user_laptop_replace_part' user_laptop.pk replaced_part.part_original.pk %}">
+                            <button class="button-black button-outline">Replace</button>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

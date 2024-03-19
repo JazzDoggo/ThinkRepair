@@ -121,6 +121,16 @@ def fix_laptop_parts(fix_parts, fix_laptops):
 
 
 @pytest.fixture
+def fix_laptop_parts_other(fix_parts, fix_laptops):
+    part = Part.objects.first()
+    laptop = Laptop.objects.last()
+    laptop_part = LaptopPart.objects.create(laptop=laptop, part=part)
+    for alt in Part.objects.exclude(pk=part.pk)[:2]:
+        laptop_part.alternative.add(alt)
+    return laptop_part
+
+
+@pytest.fixture
 def fix_user_laptop_data(fix_laptops):
     laptop = Laptop.objects.first()
     data = {

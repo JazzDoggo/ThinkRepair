@@ -22,7 +22,7 @@
 </div>
   
 <div>
-  <a href="">
+  <a href="{% url 'user_update' %}">
     <button class="button-full button-black">Update profile</button>
   </a>
   <a href="{% url 'user_laptop_add' %}">
@@ -47,7 +47,7 @@
       {% for user_laptop in laptops %}
 
       <tr>
-        <td><a href="{% url 'user_laptop_detail' user_laptop.pk %}"> {{ user_laptop.laptop }}</a></td>
+        <td><a href="{% url 'user_laptop_current' user_laptop.pk %}"> {{ user_laptop.laptop }}</a></td>
         <td>{{ user_laptop.serial }}</td>
         <td>{{ user_laptop.purchased }}</td>
       </tr>

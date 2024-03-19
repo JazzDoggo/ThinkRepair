@@ -47,6 +47,32 @@ def test_user_register_post_password_diff(client, fix_user_data):
         User.objects.get(username=fix_user_data['username'])
 
 
+@pytest.mark.django_db
+def test_user_update_get(client, fix_user):
+    client.force_login(fix_user)
+    url = reverse('user_update')
+    response = client.get(url)
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_user_update_get_no_user(client, fix_user):
+    url = reverse('user_update')
+    response = client.get(url)
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_user_update_post(client, fix_user, fix_user_data):
+    fix_user_data['username'] = 'Renamed'
+    fix_user_data['re_password'] = fix_user_data['password']
+    client.force_login(fix_user)
+    url = reverse('user_update')
+    response = client.post(url, fix_user_data)
+    assert response.status_code == 302
+    assert User.objects.get(username=fix_user_data['username'])
+
+
 def test_user_login_get(client):
     url = reverse('user_login')
     response = client.get(url)

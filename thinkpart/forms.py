@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from thinkpart.models import Part, Laptop, LaptopPart, UserLaptop
+from thinkpart.models import Part, Laptop, LaptopPart, UserLaptop, UserReplacedPart
 
 
 class UserRegisterForm(forms.ModelForm):
@@ -48,3 +48,18 @@ class UserLaptopForm(forms.ModelForm):
     class Meta:
         model = UserLaptop
         fields = ['laptop', 'serial']
+
+
+class UserReplacedPartForm(forms.ModelForm):
+    # limit queryset to original part and alternatives
+    def __init__(self, laptop_part=None, *args, **kwargs):
+        super(UserReplacedPartForm, self).__init__(*args, **kwargs)
+        if laptop_part is not None:
+            part = laptop_part.part
+            part_qs = Part.objects.filter(pk=part.pk)
+            alternatives_qs = Part.objects.filter(alternative_part__part=part).distinct()
+            self.fields['part_current'].queryset = alternatives_qs.union(part_qs)
+
+    class Meta:
+        model = UserReplacedPart
+        fields = ['part_current', 'comment']

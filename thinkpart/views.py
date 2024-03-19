@@ -10,8 +10,7 @@ from thinkpart.models import Part, Laptop, LaptopPart
 # Create your views here.
 class HomeView(View):
     def get(self, request):
-        response = render(request, 'base.html')
-        return response
+        return render(request, 'home.html')
 
 
 # USER VIEWS
@@ -34,6 +33,27 @@ class UserRegisterView(View):
             user.save()
             return redirect('user_login')
         return redirect('user_register')
+
+
+class UserUpdateView(LoginRequiredMixin, View):
+    def get(self, request):
+        user = request.user
+        cnx = {
+            'form_name': f'Update user {user}',
+            'form': UserRegisterForm(instance=user),
+            'form_button': 'Update'
+        }
+        return render(request, 'form.html', cnx)
+
+    def post(self, request):
+        user = request.user
+        form = UserRegisterForm(request.POST, instance=user)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            return redirect('user_laptop_list')
+        return redirect('user_update')
 
 
 class UserLoginView(View):

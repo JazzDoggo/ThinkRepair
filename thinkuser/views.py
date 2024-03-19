@@ -2,19 +2,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect
 from django.views import View
 
-from thinkpart.forms import UserLaptopForm
-from thinkpart.models import UserLaptop, UserReplacedPart
-
-
-def userlaptop_parts_current(pk):
-    user_laptop = UserLaptop.objects.get(pk=pk)
-    laptop_parts_current = []
-    # if UserReplacedPart.objects.filter(user_laptop=user_laptop).exists():
-    for laptop_part in user_laptop.laptop.laptoppart_set.all():
-        laptop_parts = UserReplacedPart.objects.filter(user_laptop=user_laptop,
-                                                       part_original=laptop_part).order_by('-date')
-        laptop_parts_current.append(laptop_parts[0])
-    return laptop_parts_current
+from thinkpart.forms import UserLaptopForm, UserReplacedPartForm
+from thinkpart.models import UserLaptop, UserReplacedPart, LaptopPart
 
 
 # Create your views here.
@@ -52,7 +41,7 @@ class UserLaptopListView(LoginRequiredMixin, View):
         return render(request, 'user_laptop_list.html', cnx)
 
 
-class UserLaptopDetailView(UserPassesTestMixin, View):
+class UserLaptopDetailCurrentView(UserPassesTestMixin, View):
     def test_func(self):
         user_current = self.request.user
         user_laptop = UserLaptop.objects.get(pk=self.kwargs['pk'])
@@ -62,12 +51,27 @@ class UserLaptopDetailView(UserPassesTestMixin, View):
         user_laptop = UserLaptop.objects.get(pk=pk)
         cnx = {
             'user_laptop': user_laptop,
-            'user_laptop_parts_current': userlaptop_parts_current(pk)
+            'user_laptop_replaced_parts': user_laptop.parts_current()
         }
-        return render(request, 'user_laptop_detail.html', cnx)
+        return render(request, 'user_laptop_current.html', cnx)
 
 
-class UserLaptopDeleteView(LoginRequiredMixin, View):
+class UserLaptopDetailHistoryView(UserPassesTestMixin, View):
+    def test_func(self):
+        user_current = self.request.user
+        user_laptop = UserLaptop.objects.get(pk=self.kwargs['pk'])
+        return user_current == user_laptop.user
+
+    def get(self, request, pk):
+        user_laptop = UserLaptop.objects.get(pk=pk)
+        cnx = {
+            'user_laptop': user_laptop,
+            'user_laptop_replaced_parts': user_laptop.userreplacedpart_set.all()
+        }
+        return render(request, 'user_laptop_history.html', cnx)
+
+
+class UserLaptopDeleteView(UserPassesTestMixin, View):
     def test_func(self):
         user_current = self.request.user
         user_laptop = UserLaptop.objects.get(pk=self.kwargs['pk'])
@@ -83,3 +87,35 @@ class UserLaptopDeleteView(LoginRequiredMixin, View):
             user_laptop.clean()
             user_laptop.delete()
         return redirect('user_laptop_list')
+
+
+class UserReplacedPartAddView(UserPassesTestMixin, View):
+    def test_func(self):
+        user_current = self.request.user
+        user_laptop = UserLaptop.objects.get(pk=self.kwargs['user_laptop_pk'])
+        return user_current == user_laptop.user
+
+    def get(self, request, user_laptop_pk, laptop_part_pk):
+        user_laptop = UserLaptop.objects.get(pk=user_laptop_pk)
+        laptop_part = LaptopPart.objects.get(pk=laptop_part_pk)
+        if not UserReplacedPart.objects.filter(user_laptop=user_laptop,
+                                               part_original=laptop_part).exists():
+            return redirect('user_laptop_current', pk=user_laptop_pk)
+        cnx = {
+            'form_name': f'Replace {laptop_part.part} in {user_laptop}',
+            'form': UserReplacedPartForm(laptop_part=laptop_part),
+            'form_button': 'Replace'
+        }
+        return render(request, 'form.html', cnx)
+
+    def post(self, request, user_laptop_pk, laptop_part_pk):
+        user_laptop = UserLaptop.objects.get(pk=user_laptop_pk)
+        laptop_part = LaptopPart.objects.get(pk=laptop_part_pk)
+        if UserReplacedPart.objects.filter(user_laptop=user_laptop, part_original=laptop_part).exists():
+            form = UserReplacedPartForm(request.POST)
+            if form.is_valid():
+                user_replaced_part = form.save(commit=False)
+                user_replaced_part.user_laptop = user_laptop
+                user_replaced_part.part_original = laptop_part
+                user_replaced_part.save()
+        return redirect('user_laptop_current', pk=user_laptop_pk)

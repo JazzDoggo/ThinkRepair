@@ -1,104 +1,122 @@
 /* GLOBAL */
 
 :root {
-  --thinkpad-black: #404040;
-  --thinkpad-black-hover: black;
-  --thinkpad-red: #da1e28;
-  --thinkpad-red-hover: #a2191f;
-  --thinkpad-light: #e0e0e0;
+    --thinkpad-black: #404040;
+    --thinkpad-black-hover: black;
+    --thinkpad-red: #da1e28;
+    --thinkpad-red-hover: #a2191f;
+    --thinkpad-light: #e0e0e0;
 }
 
 body * {
-  font-family: Arial, sans-serif;
+    font-family: Arial, sans-serif;
 }
 
 a {
-  color: var(--thinkpad-black);
+    color: var(--thinkpad-black);
 }
 
 a:hover {
-  color: var(--thinkpad-black-hover);
+    color: var(--thinkpad-black-hover);
 }
 
 a:has(button) {
-  text-decoration: none;
+    text-decoration: none;
 }
 
 /* NAVBAR */
 
 .nav {
-  background-color: var(--thinkpad-black);
-  display: flex;
+    background-color: var(--thinkpad-black);
+    display: flex;
+    align-items: stretch;
 }
 
 .nav .logo {
-  background-color: black;
-  padding: 10px 10px;
-  color: white;
-  font-weight: bold;
+    background-color: black;
+    color: white;
+    font-weight: bold;
 }
 
 .nav a {
-  display: block;
-  padding: 10px 10px;
-  color: var(--thinkpad-light);
-  text-decoration: none;
+    display: block;
+    padding: 10px 10px;
+    color: var(--thinkpad-light);
+    text-decoration: none;
 }
 
 .nav a:hover {
-  color: var(--thinkpad-light);
-  background-color: var(--thinkpad-black-hover);
+    color: var(--thinkpad-light);
+    background-color: var(--thinkpad-black-hover);
 }
 
 .nav-user {
-  margin-left: auto;
+    margin-left: auto;
 }
 
 /* CONTENT */
 
 .content {
-  margin: 20px 25% 0 25%;
+    margin: 20px 25% 0 25%;
+}
+
+.content-columns {
+    display: flex;
+    justify-content: stretch;
+}
+
+.content-columns div {
+    width: 50%
+}
+
+.content-columns h1, p {
+    padding-right: 20px;
+}
+
+.content-columns .image-home {
+    max-width: 100%;
+    height: auto;
 }
 
 .full-width-table {
-  width: 100%;
+    width: 100%;
 }
 
 th,
 td {
-  text-align: left;
-  padding: 0 20px 10px 0;
+    text-align: left;
+    padding: 0 20px 10px 0;
 }
 
 .table-list {
-  padding: 0;
-  list-style-position: inside;
+    padding: 0;
+    list-style-position: inside;
 }
 
 /* BUTTONS */
 
 .button-full {
-  margin: 20px 0 20px 0;
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
-  background-color: inherit;
-  color: var(--thinkpad-light) !important;
+    margin: 20px 0 20px 0;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    background-color: inherit;
+    color: var(--thinkpad-light) !important;
 }
 
 .button-outline {
-  padding: 5px;
-  border: 2px solid;
-  border-radius: 10px;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
-  background-color: transparent !important;
-  border-color: inherit;
-  color: inherit;
+    padding: 5px;
+    border: 2px solid;
+    border-radius: 10px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    background-color: transparent !important;
+    border-color: inherit;
+    color: inherit;
 }
 
 /*.button-outline:hover {*/
@@ -106,25 +124,31 @@ td {
 /*}*/
 
 .button-black {
-  background-color: var(--thinkpad-black);
-  border-color: var(--thinkpad-black);
-  color: var(--thinkpad-black);
+    background-color: var(--thinkpad-black);
+    border-color: var(--thinkpad-black);
+    color: var(--thinkpad-black);
 }
 
 .button-black:hover {
-  background-color: var(--thinkpad-black-hover);
-  border-color: var(--thinkpad-black-hover);
-  color: var(--thinkpad-black-hover);
+    background-color: var(--thinkpad-black-hover);
+    border-color: var(--thinkpad-black-hover);
+    color: var(--thinkpad-black-hover);
 }
 
 .button-red {
-  background-color: var(--thinkpad-red);
-  border-color: var(--thinkpad-red);
-  color: var(--thinkpad-red);
+    background-color: var(--thinkpad-red);
+    border-color: var(--thinkpad-red);
+    color: var(--thinkpad-red);
 }
 
 .button-red:hover {
-  background-color: var(--thinkpad-red-hover);
-  border-color: var(--thinkpad-red-hover);
-  color: var(--thinkpad-red-hover);
+    background-color: var(--thinkpad-red-hover);
+    border-color: var(--thinkpad-red-hover);
+    color: var(--thinkpad-red-hover);
+}
+
+.button-light {
+    background-color: var(--thinkpad-light);
+    border-color: var(--thinkpad-light);
+    color: var(--thinkpad-light);
 }

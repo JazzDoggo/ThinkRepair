@@ -1,0 +1,37 @@
+{% extends 'base.html' %} {% block content %}
+
+    <div>
+        <h1>{{ user_laptop }}</h1>
+    </div>
+    <div>
+        <table>
+            <tr>
+                <th>Manufacturer</th>
+                <td>{{ user_laptop.laptop.manufacturer }}</td>
+            </tr>
+            <tr>
+                <th>Series</th>
+                <td>{{ user_laptop.laptop.series }}</td>
+            </tr>
+            <tr>
+                <th>Model</th>
+                <td>{{ user_laptop.laptop.model }}</td>
+            </tr>
+            <tr>
+                <th>Year</th>
+                <td>{{ user_laptop.laptop.year }}</td>
+            </tr>
+            <tr>
+                <th>Serial number</th>
+                <td>{{ user_laptop.serial }}</td>
+            </tr>
+            <tr>
+                <th>Purchase date</th>
+                <td>{{ user_laptop.purchased }}</td>
+            </tr>
+        </table>
+    </div>
+
+    {% block user_laptop_detail %} Detail {% endblock %}
+
+{% endblock %}

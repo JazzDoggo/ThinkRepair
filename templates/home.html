@@ -1,0 +1,17 @@
+{% extends 'base.html' %} {% block content %}
+
+    <div class="content-columns">
+        <div>
+            <h1>Welcome to ThinkRepair</h1>
+            <p>
+                This app allows to find parts compatible with a specific laptop from the database.
+                Please contribute parts and laptops to the database.
+            </p>
+        </div>
+        <div>
+            {% load static %}
+            <img class="image-home" src="{% static 'thinkpad_exploded.png' %}" alt="ThinkPad Exploded">
+        </div>
+    </div>
+
+{% endblock %}

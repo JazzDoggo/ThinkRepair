@@ -49,6 +49,17 @@ class LaptopPart(models.Model):
         return f'{self.part} in {self.laptop}'
 
 
+@receiver(post_save, sender=LaptopPart)
+def create_replaced_part_for_existing(sender, instance, created, *args, **kwargs):
+    laptop_part = instance
+    user_laptops = laptop_part.laptop.userlaptop_set.all()
+    for user_laptop in user_laptops:
+        UserReplacedPart.objects.create(user_laptop=user_laptop,
+                                        part_original=laptop_part,
+                                        part_current=laptop_part.part,
+                                        comment='Retail part')
+
+
 # Laptops belonging to a user
 class UserLaptop(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -59,9 +70,19 @@ class UserLaptop(models.Model):
     def __str__(self):
         return f'{self.laptop} {self.serial}'
 
+    def parts_current(self):
+        user_laptop = self
+        laptop_parts_current = []
+        # if UserReplacedPart.objects.filter(user_laptop=user_laptop).exists():
+        for laptop_part in user_laptop.laptop.laptoppart_set.all():
+            replaced_parts = UserReplacedPart.objects.filter(user_laptop=user_laptop,
+                                                             part_original=laptop_part).order_by('-date')
+            laptop_parts_current.append(replaced_parts[0])
+        return laptop_parts_current
+
 
 @receiver(post_save, sender=UserLaptop)
-def create_user_replaced_part(sender, instance, created, *args, **kwargs):
+def create_initial_replaced_parts(sender, instance, created, *args, **kwargs):
     laptop_parts = instance.laptop.laptoppart_set.all()
     for laptop_part in laptop_parts:
         UserReplacedPart.objects.create(user_laptop=instance,
@@ -80,4 +101,4 @@ class UserReplacedPart(models.Model):
                                      on_delete=models.CASCADE,
                                      related_name='replaced_part_current')
     date = models.DateField(auto_now_add=True)
-    comment = models.TextField(blank=True)
+    comment = models.TextField()
