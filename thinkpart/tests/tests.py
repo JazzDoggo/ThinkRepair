@@ -7,7 +7,7 @@ from django.shortcuts import resolve_url
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from thinkpart.forms import PartForm, LaptopForm, LaptopPartForm
+from thinkpart.forms import PartForm, LaptopForm, LaptopPartForm, PartLaptopForm
 from thinkpart.models import Laptop, Part, LaptopPart
 
 
@@ -110,6 +110,27 @@ def test_part_list_get(client, fix_parts):
 
 
 @pytest.mark.django_db
+def test_part_search_get(client, fix_parts):
+    parts = Part.objects.all()
+    url = reverse('part_search')
+    response = client.get(url)
+    assert response.status_code == 200
+    assert len(response.context['parts']) == len(parts)
+
+
+@pytest.mark.django_db
+def test_part_search_get_type(client, fix_parts):
+    data = {
+        'product_code': '00000000'
+    }
+    parts = Part.objects.filter(product_code=data['product_code'])
+    url = reverse('part_search')
+    response = client.get(url, data)
+    assert response.status_code == 200
+    assert len(response.context['parts']) == len(parts)
+
+
+@pytest.mark.django_db
 def test_part_add_get(client):
     url = reverse('part_add')
     response = client.get(url)
@@ -164,6 +185,14 @@ def test_part_detail_get(client, fix_parts):
     response = client.get(url)
     assert response.status_code == 200
     assert response.context['part'].pk == part.pk
+
+
+@pytest.mark.django_db
+def test_part_detail_get_no_part(client, fix_parts):
+    part = Part.objects.last()
+    url = resolve_url('part_detail', pk=part.pk + 10)
+    with pytest.raises(ObjectDoesNotExist):
+        client.get(url)
 
 
 @pytest.mark.django_db
@@ -239,6 +268,14 @@ def test_laptop_detail_get(client, fix_laptops):
 
 
 @pytest.mark.django_db
+def test_laptop_detail_get_no_part(client, fix_laptops):
+    laptop = Laptop.objects.last()
+    url = resolve_url('laptop_detail', pk=laptop.pk + 10)
+    with pytest.raises(ObjectDoesNotExist):
+        client.get(url)
+
+
+@pytest.mark.django_db
 def test_laptop_update_get(client, fix_laptops, fix_laptop_data):
     laptop = Laptop.objects.first()
     url = resolve_url('laptop_update', pk=laptop.pk)
@@ -284,6 +321,28 @@ def test_laptop_delete_post(client, fix_laptops):
 
 
 # TEST LAPTOP PARTS
+
+
+@pytest.mark.django_db
+def test_part_laptop_add_get(client, fix_parts, fix_laptops):
+    part = Part.objects.first()
+    url = resolve_url('part_laptop_add', part_pk=part.pk)
+    response = client.get(url)
+    assert response.status_code == 200
+    assert isinstance(response.context['form'], PartLaptopForm)
+
+
+@pytest.mark.django_db
+def test_part_laptop_add_post(client, fix_parts, fix_laptops, fix_laptop_part_data):
+    part = Part.objects.first()
+    laptop = Laptop.objects.first()
+    laptop_parts_previous = LaptopPart.objects.count()
+    fix_laptop_part_data.pop('part')
+    fix_laptop_part_data['laptop'] = laptop.pk
+    url = resolve_url('part_laptop_add', part_pk=part.pk)
+    response = client.post(url, fix_laptop_part_data)
+    assert response.status_code == 302
+    assert LaptopPart.objects.count() == laptop_parts_previous + 1
 
 
 @pytest.mark.django_db

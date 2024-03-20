@@ -1,40 +1,43 @@
 <!doctype html>
 {% load static %}
 <html lang="en">
-<head>
-    <meta charset="UTF-8"/>
+  <head>
+    <meta charset="UTF-8" />
     <title>ThinkRepair</title>
-    <link href="{% static 'style.css' %}" rel="stylesheet"/>
-</head>
+    <link href="{% static 'style.css' %}" rel="stylesheet" />
+  </head>
 
-{% load l10n %} {% localize off %}
+  {% load l10n %} {% localize off %}
 
-    <body>
+  <body>
     <div class="container">
-        <div class="nav">
-            <div class="logo"><a href="">ThinkRepair</a></div>
-            <div><a href="{% url 'home' %}">Home</a></div>
-            <div><a href="{% url 'part_list' %}">Parts</a></div>
-            <div><a href="{% url 'laptop_list' %}">Laptops</a></div>
-            <div class="nav-user"></div>
-            {% if user.is_authenticated %}
-                <div><a href="{% url 'user_logout' %}">Logout</a></div>
-                <div class="logo"><a href="{% url 'user_laptop_list' %}">
-                    {{ user }}
-                </a></div>
-            {% else %}
-                <div><a href="{% url 'user_login' %}">Login</a></div>
-                <div><a href="{% url 'user_register' %}">Register</a></div>
-            {% endif %}
+      <div class="nav">
+        <div class="logo"><a href="">ThinkRepair</a></div>
+        <div><a href="{% url 'home' %}">Home</a></div>
+        <div><a href="{% url 'laptop_list' %}">Laptops</a></div>
+        <div><a href="{% url 'part_list' %}">Parts</a></div>
+        <div class="nav-user"></div>
+        {% if user.is_authenticated %}
+        <div><a href="{% url 'user_logout' %}">Logout</a></div>
+        <div class="logo">
+          <a href="{% url 'user_laptop_list' %}"> {{ user }} </a>
         </div>
+        {% else %}
+        <div><a href="{% url 'user_login' %}">Login</a></div>
+        <div><a href="{% url 'user_register' %}">Register</a></div>
+        {% endif %}
+      </div>
 
-        <div class="content">
-            {% block content %} Content {% endblock %}
-        </div>
+      <div class="content">{% block content %} Content {% endblock %}</div>
 
-        <div></div>
+      <div class="footer">
+        <p>
+          ThinkRepair<br>
+          Created by Kacper Kozak
+        </p>
+      </div>
     </div>
+  </body>
 
-{% endlocalize %}
-</body>
+  {% endlocalize %}
 </html>

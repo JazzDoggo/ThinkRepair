@@ -3,7 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.views import View
 
-from thinkpart.forms import PartForm, LaptopForm, UserRegisterForm, UserLoginForm, LaptopPartForm
+from thinkpart.forms import PartForm, LaptopForm, UserRegisterForm, UserLoginForm, LaptopPartForm, PartSearchForm, \
+    PartLaptopForm
 from thinkpart.models import Part, Laptop, LaptopPart
 
 
@@ -152,6 +153,36 @@ class PartDeleteView(View):
         return redirect('part_list')
 
 
+class PartSearchView(View):
+    def get(self, request):
+        compatible_laptop = request.GET.get('compatible_laptop')
+        name = request.GET.get('name')
+        part_type = request.GET.get('type')
+        manufacturer = request.GET.get('manufacturer')
+        product_code = request.GET.get('product_code')
+
+        form = PartSearchForm()
+        parts = Part.objects.all()
+        if request.GET.get('clear') != 'True':
+            form = PartSearchForm(request.GET)
+            if compatible_laptop:
+                parts = parts.filter(laptop_part__laptop=compatible_laptop)
+            if name:
+                parts = parts.filter(name__contains=name)
+            if part_type:
+                parts = parts.filter(type=part_type)
+            if manufacturer:
+                parts = parts.filter(manufacturer__contains=manufacturer)
+            if product_code:
+                parts = parts.filter(product_code__startswith=product_code)
+
+        cnx = {
+            'form': form,
+            'parts': parts
+        }
+        return render(request, 'part_search.html', cnx)
+
+
 # LAPTOP VIEWS
 
 
@@ -224,6 +255,30 @@ class LaptopDeleteView(View):
 # LAPTOP PARTS VIEWS
 
 
+class PartLaptopAddView(View):
+    def get(self, request, part_pk):
+        part = Part.objects.get(pk=part_pk)
+        cnx = {
+            'form_name': f'Add {part} to laptop',
+            'form': PartLaptopForm(),
+            'form_button': 'Add'
+        }
+        return render(request, 'form.html', cnx)
+
+    def post(self, request, part_pk):
+        part = Part.objects.get(pk=part_pk)
+        form = PartLaptopForm(request.POST)
+        if form.is_valid():
+            laptop_part = form.save(commit=False)
+            laptop_part.part = part
+            laptop_part.save()
+            laptop_part.alternative.set(form.cleaned_data['alternative'])
+            response = redirect('laptop_detail', laptop_part.laptop.pk)
+        else:
+            response = redirect('part_laptop_add', part.pk)
+        return response
+
+
 class LaptopPartAddView(View):
     def get(self, request, laptop_pk):
         laptop = Laptop.objects.get(pk=laptop_pk)
@@ -242,7 +297,10 @@ class LaptopPartAddView(View):
             laptop_part.laptop = laptop
             laptop_part.save()
             laptop_part.alternative.set(form.cleaned_data['alternative'])
-        return redirect('laptop_detail', laptop.pk)
+            response = redirect('laptop_detail', laptop.pk)
+        else:
+            response = redirect('laptop_part_add', laptop_pk)
+        return response
 
 
 class LaptopPartUpdateView(View):

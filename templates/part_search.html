@@ -1,15 +1,17 @@
 {% extends 'base.html' %} {% block content %}
 
 <div>
-  <h1>Part list</h1>
+  <h1>Search for parts</h1>
 </div>
 <div>
-  <a href="{% url 'part_search' %}">
-    <button class="button-black button-full">Search</button>
-  </a>
-  <a href="{% url 'part_add' %}">
-    <button class="button-black button-full">Add part</button>
-  </a>
+  <form method="get">
+    {% csrf_token %}
+    <table>
+      {{ form.as_table }}
+    </table>
+    <button class="button-black button-full" type="submit">Search</button>
+    <button class="button-black button-full" type="submit" name="clear" value="True">Clear</button>
+  </form>
 </div>
 <div>
   <table class="full-width-table">
@@ -23,7 +25,6 @@
       </tr>
     </thead>
     <tbody>
-    
       {% for part in parts %}
       <tr>
         <td><a href="{% url 'part_detail' part.pk %}">{{ part.name }}</a></td>

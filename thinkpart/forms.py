@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-from thinkpart.models import Part, Laptop, LaptopPart, UserLaptop, UserReplacedPart
+from thinkpart.models import Part, Laptop, LaptopPart, UserLaptop, UserReplacedPart, PART_TYPE_CHOICES
 
 
 class UserRegisterForm(forms.ModelForm):
@@ -32,10 +32,27 @@ class PartForm(forms.ModelForm):
         fields = '__all__'
 
 
+class PartSearchForm(forms.Form):
+    types = PART_TYPE_CHOICES
+    types.insert(0, ('', ''))
+
+    compatible_laptop = forms.ModelChoiceField(label='Compatible laptop', queryset=Laptop.objects.all(), required=False)
+    name = forms.CharField(label='Name', max_length=255, required=False)
+    type = forms.ChoiceField(label='Type', choices=types, required=False)
+    manufacturer = forms.CharField(label='Manufacturer', max_length=255, required=False)
+    product_code = forms.CharField(label='Product code', max_length=255, required=False)
+
+
 class LaptopForm(forms.ModelForm):
     class Meta:
         model = Laptop
         fields = '__all__'
+
+
+class PartLaptopForm(forms.ModelForm):
+    class Meta:
+        model = LaptopPart
+        fields = ['laptop', 'alternative']
 
 
 class LaptopPartForm(forms.ModelForm):
@@ -52,13 +69,12 @@ class UserLaptopForm(forms.ModelForm):
 
 class UserReplacedPartForm(forms.ModelForm):
     # limit queryset to original part and alternatives
-    def __init__(self, laptop_part=None, *args, **kwargs):
+    def __init__(self, laptop_part, *args, **kwargs):
         super(UserReplacedPartForm, self).__init__(*args, **kwargs)
-        if laptop_part is not None:
-            part = laptop_part.part
-            part_qs = Part.objects.filter(pk=part.pk)
-            alternatives_qs = Part.objects.filter(alternative_part__part=part).distinct()
-            self.fields['part_current'].queryset = alternatives_qs.union(part_qs)
+        part = Part.objects.get(pk=laptop_part.part.pk)
+        part_set = Part.objects.filter(pk=laptop_part.part.pk)
+        alternatives = Part.objects.filter(alternative_part__part=part).distinct()
+        self.fields['part_current'].queryset = alternatives.union(part_set)
 
     class Meta:
         model = UserReplacedPart

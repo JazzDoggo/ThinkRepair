@@ -34,6 +34,7 @@ urlpatterns = [
     path('parts/<int:pk>/', thinkpart_views.PartDetailView.as_view(), name='part_detail'),
     path('parts/<int:pk>/edit/', thinkpart_views.PartUpdateView.as_view(), name='part_update'),
     path('parts/<int:pk>/delete/', thinkpart_views.PartDeleteView.as_view(), name='part_delete'),
+    path('parts/search/', thinkpart_views.PartSearchView.as_view(), name='part_search'),
 
     path('laptops/', thinkpart_views.LaptopListView.as_view(), name='laptop_list'),
     path('laptops/add/', thinkpart_views.LaptopAddView.as_view(), name='laptop_add'),
@@ -41,6 +42,7 @@ urlpatterns = [
     path('laptops/<int:pk>/edit/', thinkpart_views.LaptopUpdateView.as_view(), name='laptop_update'),
     path('laptops/<int:pk>/delete/', thinkpart_views.LaptopDeleteView.as_view(), name='laptop_delete'),
 
+    path('parts/<int:part_pk>/laptop/add/', thinkpart_views.PartLaptopAddView.as_view(), name='part_laptop_add'),
     path('laptops/<int:laptop_pk>/parts/add/', thinkpart_views.LaptopPartAddView.as_view(), name='laptop_part_add'),
     path('laptops/<int:laptop_pk>/parts/<int:laptop_part_pk>/', thinkpart_views.LaptopPartUpdateView.as_view(),
          name='laptop_part_update'),

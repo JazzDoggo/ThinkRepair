@@ -4,18 +4,18 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 # Create your models here.
-PART_TYPE_CHOICES = {
-    'audio': 'Speakers',
-    'battery': 'Battery',
-    'camera': 'Webcam',
-    'display': 'Display',
-    'keyboard': 'Keyboard',
-    'memory': 'Memory RAM',
-    'motherboard': 'Motherboard',
-    'network': 'Network card',
-    'storage': 'Hard drive',
-    'touch': 'Touchpad',
-}
+PART_TYPE_CHOICES = [
+    ('audio', 'Speakers'),
+    ('battery', 'Battery'),
+    ('camera', 'Webcam'),
+    ('display', 'Display'),
+    ('keyboard', 'Keyboard'),
+    ('memory', 'Memory RAM'),
+    ('motherboard', 'Motherboard'),
+    ('network', 'Network card'),
+    ('storage', 'Hard drive'),
+    ('touch', 'Touchpad'),
+]
 
 
 class Laptop(models.Model):
@@ -23,6 +23,9 @@ class Laptop(models.Model):
     series = models.CharField(max_length=64)
     manufacturer = models.CharField(max_length=255)
     year = models.IntegerField()
+
+    class Meta:
+        ordering = ['year']
 
     def __str__(self):
         return f'{self.manufacturer} {self.series} {self.model}'
@@ -34,6 +37,9 @@ class Part(models.Model):
     type = models.CharField(choices=PART_TYPE_CHOICES, max_length=16)
     manufacturer = models.CharField(max_length=255)
     details = models.TextField(blank=True)
+
+    # class Meta:
+    #     ordering = ['product_code']
 
     def __str__(self):
         return f'{self.manufacturer} {self.name} {self.product_code}'
@@ -48,16 +54,18 @@ class LaptopPart(models.Model):
     def __str__(self):
         return f'{self.part} in {self.laptop}'
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        super().save(force_insert, force_update, using, update_fields)
+        self.create_additional_user_part()
 
-@receiver(post_save, sender=LaptopPart)
-def create_replaced_part_for_existing(sender, instance, created, *args, **kwargs):
-    laptop_part = instance
-    user_laptops = laptop_part.laptop.userlaptop_set.all()
-    for user_laptop in user_laptops:
-        UserReplacedPart.objects.create(user_laptop=user_laptop,
-                                        part_original=laptop_part,
-                                        part_current=laptop_part.part,
-                                        comment='Retail part')
+    def create_additional_user_part(self):
+        laptop_part = self
+        user_laptops = laptop_part.laptop.userlaptop_set.all()
+        for user_laptop in user_laptops:
+            UserReplacedPart.objects.create(user_laptop=user_laptop,
+                                            part_original=laptop_part,
+                                            part_current=laptop_part.part,
+                                            comment='Retail part')
 
 
 # Laptops belonging to a user
@@ -66,6 +74,9 @@ class UserLaptop(models.Model):
     laptop = models.ForeignKey(Laptop, on_delete=models.CASCADE)
     purchased = models.DateField(auto_now_add=True)
     serial = models.CharField(max_length=64, unique=True)
+
+    class Meta:
+        ordering = ['-purchased']
 
     def __str__(self):
         return f'{self.laptop} {self.serial}'
@@ -80,25 +91,28 @@ class UserLaptop(models.Model):
             laptop_parts_current.append(replaced_parts[0])
         return laptop_parts_current
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        super().save(force_insert, force_update, using, update_fields)
+        self.create_initial_user_parts()
 
-@receiver(post_save, sender=UserLaptop)
-def create_initial_replaced_parts(sender, instance, created, *args, **kwargs):
-    laptop_parts = instance.laptop.laptoppart_set.all()
-    for laptop_part in laptop_parts:
-        UserReplacedPart.objects.create(user_laptop=instance,
-                                        part_original=laptop_part,
-                                        part_current=laptop_part.part,
-                                        comment='Retail part')
+    def create_initial_user_parts(self):
+        laptop_parts = self.laptop.laptoppart_set.all()
+        for laptop_part in laptop_parts:
+            UserReplacedPart.objects.create(user_laptop=self,
+                                            part_original=laptop_part,
+                                            part_current=laptop_part.part,
+                                            comment='Retail part')
 
 
 # History of replaced parts for a laptop
 class UserReplacedPart(models.Model):
     user_laptop = models.ForeignKey(UserLaptop, on_delete=models.CASCADE)
     part_original = models.ForeignKey(LaptopPart, on_delete=models.CASCADE, related_name='replaced_part_original')
-    # limit options to original part or alternative
     part_current = models.ForeignKey(Part,
-                                     # limit_choices_to={'type': part_old.part.type},
                                      on_delete=models.CASCADE,
                                      related_name='replaced_part_current')
     date = models.DateField(auto_now_add=True)
     comment = models.TextField()
+
+    class Meta:
+        ordering = ['-date']

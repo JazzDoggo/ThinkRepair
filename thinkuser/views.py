@@ -103,7 +103,7 @@ class UserReplacedPartAddView(UserPassesTestMixin, View):
             return redirect('user_laptop_current', pk=user_laptop_pk)
         cnx = {
             'form_name': f'Replace {laptop_part.part} in {user_laptop}',
-            'form': UserReplacedPartForm(laptop_part=laptop_part),
+            'form': UserReplacedPartForm(laptop_part),
             'form_button': 'Replace'
         }
         return render(request, 'form.html', cnx)
@@ -112,7 +112,7 @@ class UserReplacedPartAddView(UserPassesTestMixin, View):
         user_laptop = UserLaptop.objects.get(pk=user_laptop_pk)
         laptop_part = LaptopPart.objects.get(pk=laptop_part_pk)
         if UserReplacedPart.objects.filter(user_laptop=user_laptop, part_original=laptop_part).exists():
-            form = UserReplacedPartForm(request.POST)
+            form = UserReplacedPartForm(laptop_part, request.POST)
             if form.is_valid():
                 user_replaced_part = form.save(commit=False)
                 user_replaced_part.user_laptop = user_laptop
