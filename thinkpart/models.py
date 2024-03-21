@@ -85,10 +85,10 @@ class UserLaptop(models.Model):
         user_laptop = self
         laptop_parts_current = []
         # if UserReplacedPart.objects.filter(user_laptop=user_laptop).exists():
-        for laptop_part in user_laptop.laptop.laptoppart_set.all():
-            replaced_parts = UserReplacedPart.objects.filter(user_laptop=user_laptop,
-                                                             part_original=laptop_part).order_by('-date')
-            laptop_parts_current.append(replaced_parts[0])
+        laptop_parts = user_laptop.laptop.laptoppart_set.all()
+        replaced_parts = user_laptop.userreplacedpart_set.all().order_by('-date')
+        for laptop_part in laptop_parts:
+            laptop_parts_current.append(replaced_parts.filter(part_original=laptop_part)[0])
         return laptop_parts_current
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
@@ -111,7 +111,7 @@ class UserReplacedPart(models.Model):
     part_current = models.ForeignKey(Part,
                                      on_delete=models.CASCADE,
                                      related_name='replaced_part_current')
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
     comment = models.TextField()
 
     class Meta:

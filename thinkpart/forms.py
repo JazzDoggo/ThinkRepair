@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 from thinkpart.models import Part, Laptop, LaptopPart, UserLaptop, UserReplacedPart, PART_TYPE_CHOICES
 
@@ -71,10 +72,10 @@ class UserReplacedPartForm(forms.ModelForm):
     # limit queryset to original part and alternatives
     def __init__(self, laptop_part, *args, **kwargs):
         super(UserReplacedPartForm, self).__init__(*args, **kwargs)
-        part = Part.objects.get(pk=laptop_part.part.pk)
-        part_set = Part.objects.filter(pk=laptop_part.part.pk)
-        alternatives = Part.objects.filter(alternative_part__part=part).distinct()
-        self.fields['part_current'].queryset = alternatives.union(part_set)
+        compatible_parts = Part.objects.filter(
+            Q(alternative_part__part=laptop_part.part) | Q(pk=laptop_part.part.pk)
+        ).distinct()
+        self.fields['part_current'].queryset = compatible_parts
 
     class Meta:
         model = UserReplacedPart
