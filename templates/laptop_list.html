@@ -1,0 +1,49 @@
+{% extends 'base.html' %} {% block content %}
+
+<div>
+  <h1>Laptop list</h1>
+</div>
+<div>
+  <a href="{% url 'laptop_add' %}">
+    <button class="button-full button-black">Add laptop</button>
+  </a>
+</div>
+<div>
+  <table class="full-width-table">
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Series</th>
+        <th>Manufacturer</th>
+        <th>Year</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for laptop in laptops %}
+
+      <tr>
+        <td>
+          <a href="{% url 'laptop_detail' laptop.pk %}"> {{ laptop.model }} </a>
+        </td>
+        <td>{{ laptop.series }}</td>
+        <td>{{ laptop.manufacturer }}</td>
+        <td>{{ laptop.year }}</td>
+        <td>
+          <a href="{% url 'laptop_part_add' laptop.pk %}">
+            <button class="button-black button-outline">Add part</button>
+          </a>
+          <a href="{% url 'laptop_update' laptop.pk %}">
+            <button class="button-black button-outline">Update</button>
+          </a>
+          <a href="{% url 'laptop_delete' laptop.pk %}">
+            <button class="button-red button-outline">Delete</button>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

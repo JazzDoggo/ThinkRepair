@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
+from django.urls import reverse_lazy
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "repairpad.apps.RepairpadConfig"
+    "thinkpart.apps.ThinkpartConfig",
+    "thinkuser.apps.ThinkuserConfig"
 ]
 
 MIDDLEWARE = [
@@ -111,7 +114,12 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
+USE_L10N = True
+
 USE_TZ = True
+
+DATE_FORMAT = 'Y F j'
+DATETIME_FORMAT = 'Y F j, G:i'
 
 
 # Static files (CSS, JavaScript, Images)
@@ -123,3 +131,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = reverse_lazy('user_login')

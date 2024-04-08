@@ -1,0 +1,41 @@
+{% extends 'base.html' %} {% block content %}
+
+<div>
+  <h1>{{ part }}</h1>
+</div>
+
+<div>
+  <table>
+    <tr>
+      <th>Name</th>
+      <td>{{ part.name }}</td>
+    </tr>
+    <tr>
+      <th>Manufacturer</th>
+      <td>{{ part.manufacturer }}</td>
+    </tr>
+    <tr>
+      <th>Type</th>
+      <td>{{ part.type }}</td>
+    </tr>
+    <tr>
+      <th>Product code</th>
+      <td>{{ part.product_code }}</td>
+    </tr>
+    <tr>
+      <th>Details</th>
+      <td>{{ part.details }}</td>
+    </tr>
+  </table>
+</div>
+
+<div>
+  <a href="{% url 'part_update' part.pk %}">
+    <button class="button-black button-full">Update</button>
+  </a>
+  <a href="{% url 'part_delete' part.pk %}">
+    <button class="button-red button-full">Delete</button>
+  </a>
+</div>
+
+{% endblock %}

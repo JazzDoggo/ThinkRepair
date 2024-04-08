@@ -1,0 +1,30 @@
+{% extends 'base.html' %} {% block content %}
+
+<div>
+  <h1>Delete {{ object }}</h1>
+</div>
+
+<div>
+  <p>Are you sure?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button
+      class="button-black button-full"
+      type="submit"
+      name="confirm"
+      value="True"
+    >
+      Yes
+    </button>
+    <button
+      class="button-black button-full"
+      type="submit"
+      name="confirm"
+      value="False"
+    >
+      No
+    </button>
+  </form>
+</div>
+
+{% endblock %}

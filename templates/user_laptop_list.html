@@ -1,0 +1,60 @@
+{% extends 'base.html' %} {% block content %}
+
+<div>
+  <h1>Hello, {{ user }}</h1>
+</div>
+  
+<div>
+  <table>
+    <tr>
+      <th>E-mail</th>
+      <td>{{ user.email }}</td>
+    </tr>
+    <tr>
+      <th>Joined</th>
+      <td>{{ user.date_joined }}</td>
+    </tr>
+    <tr>
+      <th>Last login</th>
+      <td>{{ user.last_login }}</td>
+    </tr>
+  </table>
+</div>
+  
+<div>
+  <a href="{% url 'user_update' %}">
+    <button class="button-full button-black">Update profile</button>
+  </a>
+  <a href="{% url 'user_laptop_add' %}">
+    <button class="button-full button-black">Add your laptop</button>
+  </a>
+</div>
+
+<div>
+  <h2>Your laptops</h2>
+</div>
+
+<div>
+  <table class="full-width-table">
+    <thead>
+      <tr>
+        <th>Laptop</th>
+        <th>Serial number</th>
+        <th>Purchase date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user_laptop in laptops %}
+
+      <tr>
+        <td><a href="{% url 'user_laptop_current' user_laptop.pk %}"> {{ user_laptop.laptop }}</a></td>
+        <td>{{ user_laptop.serial }}</td>
+        <td>{{ user_laptop.purchased }}</td>
+      </tr>
+        
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
